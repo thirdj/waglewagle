@@ -1,0 +1,64 @@
+{
+  /**
+   * 확장
+   */
+  "extends": ["airbnb"],
+
+  /**
+   * 파서
+   */
+  "parser": "babel-eslint",
+
+  "globals": {
+    "window": false,
+    "document": false,
+    "SpeechRecognition": false,
+    "Notification": false
+  },
+
+  /**
+   * 사용자화
+   */
+  "rules": {
+    "arrow-parens": 0,
+    "arrow-body-style": ["error", "always"],
+    "comma-dangle": ["error", "never"],
+    "consistent-return": 0,
+    "class-methods-use-this": 0,
+    "default-case": 0,
+    "global-require": 0,
+    "guard-for-in": 0,
+    "func-names": 0,
+    "import/no-unresolved": ["error", {ignore: ['electron']}],
+    "import/no-extraneous-dependencies": 0,
+    "import/newline-after-import": 0,
+    "import/imports-first": 0,
+    "import/extensions": 0,
+    "import/no-dynamic-require": 0,
+    "import/prefer-default-export": 0,
+    "max-len": ["error", 100, 2, {"ignoreComments": true}],
+    "new-cap": ["error", {"newIsCap": true, "capIsNew": false}],
+    "newline-per-chained-call": 0,
+    "linebreak-style": 0,
+    "no-console": 0,
+    "no-labels": 0,
+    "no-plusplus": 0,
+    "no-bitwise": 0,
+    "no-cond-assign": 0,
+    "no-global-assign": 0,
+    "no-param-reassign": 0,
+    "no-underscore-dangle": 0,
+    "no-unsafe-negation": 0,
+    "no-restricted-syntax": 0,
+    "no-shadow": ["error", {"hoist": "functions"}],
+    "no-use-before-define": ["error", "nofunc"],
+    "no-unused-expressions": ["error", {allowShortCircuit: true, allowTernary: true}],
+    "no-mixed-operators": 0,
+    "no-prototype-builtins": 0,
+    "object-curly-spacing": 0, // ["error", "never"]
+    "object-property-newline": 0,
+    "quote-props": ["error", "as-needed", {"keywords": true}],
+    "space-before-function-paren": ["error", "never"],
+    "strict": 0
+  }
+}
