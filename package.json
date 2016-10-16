@@ -1,15 +1,14 @@
 {
-  "name": "webpack-howto-example",
+  "name": "waglewagle",
   "version": "1.0.0",
-  "description": "",
+  "description": "An unnamed square",
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist/*",
-    "ss": "webpack-dev-server",
-    "start": "NODE_ENV=development npm run clean && ./node_modules/.bin/webpack-dev-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack-dev-server",
+    "start": "NODE_ENV=development npm run clean && ./node_modules/.bin/webpack-dev-server"
   },
-  "author": "",
+  "author": "thirdj <thirdj@gmail.com> (http://thirdj.github.io)",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.16.0",
@@ -29,6 +28,7 @@
   },
   "dependencies": {
     "firebase": "^3.5.0",
-    "jquery": "^3.1.1"
+    "jquery": "^3.1.1",
+    "moment": "^2.15.1"
   }
 }

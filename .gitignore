@@ -1,4 +1,4 @@
 public/bundle.js
 node_modules/**
 build/**
-src/firebase.config.js
+assets/javascripts/firebase.config.js
