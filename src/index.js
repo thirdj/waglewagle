@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import moment from 'moment';
+
 import { database } from '../assets/javascripts/firebaseInit';
 import colors from '../assets/javascripts/helpers/colors';
 
@@ -9,27 +10,10 @@ const uname = unnamed();
 // Get a key for a new Post.
 const newMsgKey = database.ref().child('wagle/messages').push().key;
 const users = database.ref().child('wagle/users');
+
 const randomColor = Math.floor(Math.random() * colors.length);
 const ucolor = colors[randomColor];
 
-/*
-function initUserSetting() {
-  const uid = createGuid();
-  const name = unnamed();
-
-  const usersRef = dbRef.child('wagle/users');
-
-  usersRef.push({
-    uid,
-    // name,
-    creation
-  });
-
-  userId = uid;
-  userName = name;
-}
-initUserSetting();
-*/
 // "value", "child_added", "child_removed", "child_changed", or "child_moved".
 database.ref().child('wagle/users').on('child_removed', chat => {
   const chatVal = chat.val();
@@ -37,8 +21,14 @@ database.ref().child('wagle/users').on('child_removed', chat => {
 });
 
 database.ref().child('wagle/users').on('child_added', chat => {
-  const chatVal = chat.val();
-  console.log('users child_added chat  ', chatVal);
+  const chatData = chat.val();
+  let data = {};
+  // console.log('Object.keys(chatData)  ', Object.keys(chatData)[0]);
+  if (newMsgKey === Object.keys(chatData)[0]) {
+    data = setAppendMsg(chatData, newMsgKey);
+    appendMsg(data);
+  }
+  // console.log('users child_added chat  ', chatVal);
 });
 
 database.ref().child('wagle/messages').on('child_changed', chat => {
@@ -47,40 +37,59 @@ database.ref().child('wagle/messages').on('child_changed', chat => {
   let data = {};
   for (const key in chatData) {
     // console.log('222 chatData  ', chatData[key]);
-    data = {
-      uid: chatData[key].uid,
-      msg: chatData[key].msg,
-      ucolor: chatData[key].ucolor,
-      creation: chatData[key].creation
-    };
+    data = setAppendMsg(chatData, key);
   }
   // console.log('messages child_changed chat  ', chatData);
   appendMsg(data);
 });
 
-$('#wagle-form').on('submit', e => {
-  e.preventDefault();
-  e.stopPropagation();
-  const userMessage = $('footer input');
-  const times = getCurrentTime();
+function setAppendMsg(data, key) {
+  return {
+    uid: data[key].uid,
+    msg: data[key].msg,
+    ucolor: data[key].ucolor,
+    creation: data[key].creation
+  };
+}
 
-  writeNewMessage(userMessage.val(), times.unix);
+$(() => {
+  const wagleInputMessage = $('#wagle-input');
 
-  userMessage.val('').focus();
+  $('main, footer').on('click', () => {
+    wagleInputMessage.focus();
+  });
+
+  wagleInputMessage.val('').focus();
+
+  $('#wagle-form').on('submit', e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const times = getCurrentTime();
+
+    if ($.trim(wagleInputMessage.val()) === '') {
+      wagleInputMessage.val('').focus();
+      return false;
+    }
+
+    writeNewMessage(wagleInputMessage.val(), times.unix);
+
+    wagleInputMessage.val('').focus();
+  });
 });
 
 function appendMsg(data) {
   const time = moment().format('HH:mm');
-  $('#chat').append(
+  $('#messages').append(
     `
       <div class="logs">
         <span class="time">${time}</span>
-        <span style="color:${data.ucolor};">${data.uid}</span>
+        <span style="color:${data.ucolor};" class="user">${data.uid}</span>
         <span class="msg">${data.msg}</span>
       </div>
     `
   );
-  $('#chat').scrollTop($('#chat')[0].scrollHeight);
+  $('#messages').scrollTop($('#messages')[0].scrollHeight);
 }
 
 function writeNewMessage(msg, timestamp, uid = uname) {

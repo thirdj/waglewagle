@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
 <title>waglewagle</title>
 <link rel="stylesheet" href="./assets/stylesheets/layout.css">
 <link rel="icon" type="image/png" href="./assets/images/icon.png" />
@@ -9,15 +10,23 @@
 </head>
 <body>
 <div id="root">
-  <header>WagleWagle</header>
+  <header>
+    <div class="header">
+      <img src="./assets/images/icon.png" alt="chatting..." />
+      <span>WagleWagle</span>
+    </div>
+    <!--div class="out">
+      <span>Exit</span>
+    </div-->
+  </header>
   <main>
-    <section id="chat">
+    <section id="messages">
     </section>
   </main>
   <footer>
     <form id="wagle-form">
-      <input type="text" placeholder="Type A Message....">
-      <button type="submit" id="send">Send</button>
+      <input type="text" id="wagle-input" placeholder="Type your message here..." autocomplete="off" />
+      <!-- <button type="submit" id="send">Send</button> -->
     </form>
   </footer>
 </div>
