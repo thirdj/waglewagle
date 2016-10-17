@@ -1,26 +1,25 @@
 import $ from 'jquery';
 import moment from 'moment';
 import { database } from '../assets/javascripts/firebaseInit';
-// import unname from '../assets/javascripts/helpers/unname';
-// import guid from '../assets/javascripts/helpers/createGuid';
+import colors from '../assets/javascripts/helpers/colors';
 
-// const currentTime = moment().format('HHmmss');
 const creation = moment().format('YYYY-MM-DD HH:mm:ss');
-// const timestamp = moment().unix();
+const uname = unnamed();
 
-const dbRef = database.ref();
-// const rootRef = dbRef.child('wagle');
+// Get a key for a new Post.
+const newMsgKey = database.ref().child('wagle/messages').push().key;
+const users = database.ref().child('wagle/users');
+const randomColor = Math.floor(Math.random() * colors.length);
+const ucolor = colors[randomColor];
 
-let userId;
-let userName;
-
+/*
 function initUserSetting() {
   const uid = createGuid();
   const name = unnamed();
 
-  const usersRef = dbRef.child(`wagle/users/${name}`);
+  const usersRef = dbRef.child('wagle/users');
 
-  usersRef.set({
+  usersRef.push({
     uid,
     // name,
     creation
@@ -30,27 +29,75 @@ function initUserSetting() {
   userName = name;
 }
 initUserSetting();
-
+*/
 // "value", "child_added", "child_removed", "child_changed", or "child_moved".
-database.ref().child('wagle').on('child_added', chat => {
+database.ref().child('wagle/users').on('child_removed', chat => {
   const chatVal = chat.val();
-  console.log('chat  ', chatVal);
+  console.log('users child_removed chat  ', chatVal);
 });
 
-$('#send').on('click', () => {
-  console.log(userName);
+database.ref().child('wagle/users').on('child_added', chat => {
+  const chatVal = chat.val();
+  console.log('users child_added chat  ', chatVal);
+});
+
+database.ref().child('wagle/messages').on('child_changed', chat => {
+  const chatData = chat.val();
+  // console.log('111 chatData  ', chatData);
+  let data = {};
+  for (const key in chatData) {
+    // console.log('222 chatData  ', chatData[key]);
+    data = {
+      uid: chatData[key].uid,
+      msg: chatData[key].msg,
+      ucolor: chatData[key].ucolor,
+      creation: chatData[key].creation
+    };
+  }
+  // console.log('messages child_changed chat  ', chatData);
+  appendMsg(data);
+});
+
+$('#wagle-form').on('submit', e => {
+  e.preventDefault();
+  e.stopPropagation();
+  const userMessage = $('footer input');
   const times = getCurrentTime();
-  // const name = unnamed();
-  const chatRef = dbRef.child(`wagle/chat/${userName}/${times.unix}`);
-  const userMessage = $('footer input').val();
-  chatRef.set({
-    uid: userId,
-    userMessage,
-    creation: times.creation
-  });
 
-  // console.log(uid, name);
+  writeNewMessage(userMessage.val(), times.unix);
+
+  userMessage.val('').focus();
 });
+
+function appendMsg(data) {
+  const time = moment().format('HH:mm');
+  $('#chat').append(
+    `
+      <div class="logs">
+        <span class="time">${time}</span>
+        <span style="color:${data.ucolor};">${data.uid}</span>
+        <span class="msg">${data.msg}</span>
+      </div>
+    `
+  );
+  $('#chat').scrollTop($('#chat')[0].scrollHeight);
+}
+
+function writeNewMessage(msg, timestamp, uid = uname) {
+  const msgData = { uid, msg, creation, ucolor };
+  const updates = {};
+
+  updates[`/wagle/messages/${newMsgKey}/${timestamp}`] = msgData;
+
+  users.once('value', snapshot => {
+    if (!snapshot.hasChild(uid)) {
+      updates[`/wagle/users/${uid}/${newMsgKey}`] = msgData;
+    } else {
+      console.log('That user already exists');
+    }
+  });
+  return database.ref().update(updates);
+}
 
 function createGuid() {
   function p8(s) {
@@ -59,6 +106,7 @@ function createGuid() {
   }
   return p8() + p8(true) + p8(true) + p8();
 }
+console.log('🐶 createGuid ', createGuid());
 
 function unnamed() {
   return Math.random().toString(36).slice(2, 10);

@@ -6,7 +6,8 @@
   "scripts": {
     "clean": "rm -rf dist/*",
     "dev": "webpack-dev-server",
-    "start": "NODE_ENV=development npm run clean && ./node_modules/.bin/webpack-dev-server"
+    "build": "webpack --progress --colors",
+    "start": "NODE_ENV=development npm run clean && ./node_modules/.bin/webpack-dev-server --host=0.0.0.0 --hot --inline --progress --history-api-fallback"
   },
   "author": "thirdj <thirdj@gmail.com> (http://thirdj.github.io)",
   "license": "ISC",
@@ -19,6 +20,7 @@
     "bundle-loader": "^0.5.0",
     "css-loader": "^0.25.0",
     "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.22.0",
     "less": "^1.7.5",
     "less-loader": "^0.7.7",
     "style-loader": "^0.13.1",

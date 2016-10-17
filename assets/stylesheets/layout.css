@@ -25,18 +25,35 @@ html, body {
   display: flex;
 }
 
-#root main section {
-  background-color: yellowgreen;
+#root main #chat {
+  background-color: #262626;
   flex-grow: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow-y: auto;
+  color: #cccccb;
 }
 
-#root footer {
+#root main #chat .time {
+  color: #8c8c8c;
+}
+
+#root main #chat .user {
+  color: #00bfff;
+  font-weight: bold;
+}
+
+#root main #chat .msg {
+  color: #cac9c8;
+}
+
+#root footer form {
   background-color: #000;
   border-top: 1px solid gray;
   display: flex;
 }
 
-#root footer input {
+#root footer form input {
   flex-grow: 10;
   background-color: #a3be8c;
   padding: 5px 10px;
@@ -45,7 +62,7 @@ html, body {
   border: none;
 }
 
-#root footer button {
+#root footer form button {
   flex-grow: 1;
   background-color: gray;
   border: none;
