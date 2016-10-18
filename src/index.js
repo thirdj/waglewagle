@@ -4,46 +4,111 @@ import moment from 'moment';
 import { database } from '../assets/javascripts/firebaseInit';
 import colors from '../assets/javascripts/helpers/colors';
 
-const creation = moment().format('YYYY-MM-DD HH:mm:ss');
-const uname = unnamed();
+const dbRef = database.ref();
 
 // Get a key for a new Post.
-const newMsgKey = database.ref().child('wagle/messages').push().key;
-const users = database.ref().child('wagle/users');
+const newMsgKey = dbRef.child('wagle/messages').push().key;
+// const users = dbRef.child('wagle/users');
 
-const randomColor = Math.floor(Math.random() * colors.length);
-const ucolor = colors[randomColor];
+// const randomColor = Math.floor(Math.random() * colors.length);
+const creation = moment().format('YYYY-MM-DD HH:mm:ss');
+const ucolor = colors[getColor()];
+const uname = unnamed();
+
+function getColor() {
+  return Math.floor(Math.random() * colors.length);
+}
+
+function joinUser() {
+  // dbRef.child('wagle/users').on('child_added', chat => {
+  //   console.info('wagle/users  child_added');
+  //   const chatData = chat.val();
+  //   let data = {};
+  //   // console.log('Object.keys(chatData)  ', Object.keys(chatData)[0]);
+  //   // console.log('newMsgKey ', newMsgKey);
+  //   // console.log('Object.keys(chatData)[0] ', Object.keys(chatData)[0]);
+  //   if (newMsgKey === Object.keys(chatData)[0]) {
+  //     console.log('users child_added same');
+  //     data = setAppendMsgData(chatData, newMsgKey);
+  //     appendMsg(data);
+  //   }
+  //   // console.log('users child_added chat  ', chatVal);
+  // });
+  const msg = '입장 했습니다.';
+  const uid = uname;
+  const msgData = { uid, msg, creation, ucolor };
+  const updates = {};
+
+  updates[`/wagle/users/${uname}/${newMsgKey}`] = msgData;
+  updates[`/wagle/messages/${newMsgKey}/${getCurrentTime().unix}`] = msgData;
+  // users.once('value', snapshot => {
+  //   console.log('[writeNewMessage] user.once');
+  //   if (!snapshot.hasChild(uid)) {
+  //     console.log('[writeNewMessage] not uid');
+  //     updates[`/wagle/users/${uid}/${newMsgKey}`] = msgData;
+  //   } else {
+  //     console.log('[writeNewMessage] That user already exists');
+  //   }
+  // });
+  // console.log('[writeNewMessage] before return');
+  return database.ref().update(updates);
+}
+
+joinUser();
 
 // "value", "child_added", "child_removed", "child_changed", or "child_moved".
-database.ref().child('wagle/users').on('child_removed', chat => {
+dbRef.child('wagle/users').on('child_removed', chat => {
   const chatVal = chat.val();
   console.log('users child_removed chat  ', chatVal);
 });
 
-database.ref().child('wagle/users').on('child_added', chat => {
+dbRef.child('wagle/users').on('child_added', chat => {
+  // console.info('wagle/users  child_added');
   const chatData = chat.val();
   let data = {};
   // console.log('Object.keys(chatData)  ', Object.keys(chatData)[0]);
+  // console.log('newMsgKey ', newMsgKey);
+  // console.log('Object.keys(chatData)[0] ', Object.keys(chatData)[0]);
   if (newMsgKey === Object.keys(chatData)[0]) {
-    data = setAppendMsg(chatData, newMsgKey);
-    appendMsg(data);
+    // console.log('users child_added same');
+    data = setAppendMsgData(chatData, newMsgKey);
   }
+  appendMsg(data);
   // console.log('users child_added chat  ', chatVal);
 });
-
-database.ref().child('wagle/messages').on('child_changed', chat => {
+/*
+dbRef.child('wagle/messages').on('child_added', chat => {
+  console.info('wagle/messages  child_added');
+  const chatData = chat.val();
+  // console.log('111 chatData  ', chatData);
+  let data = {};
+  for (const key in chatData) {
+    console.log('222 chatData  ', chatData[key]);
+    console.log('chatData[key].uid ', chatData[key].uid);
+    console.log('uname ', uname);
+    if (uname === chatData[key].uid) {
+      data = setAppendMsgData(chatData, key);
+      appendMsg(data);
+    }
+  }
+  // console.log('messages child_added chat  ', chatData);
+});
+*/
+dbRef.child('wagle/messages').on('child_changed', chat => {
+  // console.info('wagle/messages  child_changed');
   const chatData = chat.val();
   // console.log('111 chatData  ', chatData);
   let data = {};
   for (const key in chatData) {
     // console.log('222 chatData  ', chatData[key]);
-    data = setAppendMsg(chatData, key);
+    data = setAppendMsgData(chatData, key);
   }
   // console.log('messages child_changed chat  ', chatData);
   appendMsg(data);
 });
 
-function setAppendMsg(data, key) {
+function setAppendMsgData(data, key) {
+  // console.log('setAppendMsgData', data, key);
   return {
     uid: data[key].uid,
     msg: data[key].msg,
@@ -79,32 +144,30 @@ $(() => {
 });
 
 function appendMsg(data) {
-  const time = moment().format('HH:mm');
-  $('#messages').append(
-    `
-      <div class="logs">
-        <span class="time">${time}</span>
-        <span style="color:${data.ucolor};" class="user">${data.uid}</span>
-        <span class="msg">${data.msg}</span>
-      </div>
-    `
-  );
-  $('#messages').scrollTop($('#messages')[0].scrollHeight);
+  // console.log('appendMsg ', data);
+  if (Object.keys(data).length && data.constructor === Object) {
+    const time = moment().format('HH:mm');
+    $('#messages').append(
+      `
+        <div class="logs">
+          <span class="time">${time}</span>
+          <span style="color:${data.ucolor};" class="user">${data.uid}</span>
+          <span class="msg">${data.msg}</span>
+        </div>
+      `
+    );
+    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+  }
 }
 
 function writeNewMessage(msg, timestamp, uid = uname) {
+  // console.info('start [writeNewMessage]');
   const msgData = { uid, msg, creation, ucolor };
   const updates = {};
 
   updates[`/wagle/messages/${newMsgKey}/${timestamp}`] = msgData;
-
-  users.once('value', snapshot => {
-    if (!snapshot.hasChild(uid)) {
-      updates[`/wagle/users/${uid}/${newMsgKey}`] = msgData;
-    } else {
-      console.log('That user already exists');
-    }
-  });
+  updates[`/wagle/users/${uid}/${newMsgKey}`] = msgData;
+  // console.log('[writeNewMessage] before return');
   return database.ref().update(updates);
 }
 
