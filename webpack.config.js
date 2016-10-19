@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
 const nodeModulesDir = path.resolve(__dirname, 'node_modules');
+
 const PATHS = {
   entry: path.join(__dirname, 'src'),
   app: path.join(__dirname, 'app'),
@@ -16,22 +16,9 @@ module.exports = {
 
   output: {
     path: PATHS.dist,
-    // publicPath: PATHS.base,
+    publicPath: PATHS.assets,
     filename: 'bundle.js'
   },
-
-  devServer: {
-    contentBase: PATHS.base,
-    historyApiFallback: true,
-    hot: true,
-    inline: true,
-    progress: true,
-    // stats: 'errors-only',
-    host: '0.0.0.0',
-    port: 5001
-  },
-
-  devtool: 'eval-source-map',
 
   module: {
     preLoaders: [
@@ -53,7 +40,8 @@ module.exports = {
       },
       { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loaders
       { test: /\.css$/, loader: 'style-loader!css-loader' },
-      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
+      // { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
+      { test: /\.(png|jpg)$/, loader: 'file-loader?name=./assets/images/img-[hash:6].[ext]' }
     ]
   },
   plugins: [
@@ -62,21 +50,11 @@ module.exports = {
         warnings: false
       }
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.optimize.OccurrenceOrderPlugin(),
-    // new HtmlWebpackPlugin({
-    //   title: 'WagleWagle',
-    //   template: path.resolve(__dirname, 'index.html'),
-    //   inject: 'body',
-    //   minify: {
-    //     removeComments: true,
-    //     collapseWhitespace: true
-    //   }
-    // }),
     new webpack.DefinePlugin({
-      __DEV__: JSON.stringify(JSON.parse(process.env.BUILD_DEV || 'false')),
-      __STAGING__: JSON.stringify(JSON.parse(process.env.BUILD_STAGING || 'false')),
-      __API_HOST__: JSON.stringify(process.env.BUILD_STAGING ? 'apis' : 'api')
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
     })
   ]
 };

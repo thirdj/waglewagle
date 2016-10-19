@@ -1,52 +1,61 @@
 const webpack = require('webpack');
 const path = require('path');
-const node_modules_dir = path.join(__dirname, 'node_modules');
+const nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
+const PATHS = {
+  entry: path.join(__dirname, 'src'),
+  app: path.join(__dirname, 'app'),
+  dist: path.join(__dirname, 'dist'),
+  assets: path.join(__dirname, 'assets'),
+  base: path.join(__dirname)
+};
+
+console.log('PATHS.entry ', PATHS.entry);
 module.exports = {
-  devtool: 'source-map',
-
-  devServer: {
-    hot: true,
-    inline: true
-  },
-
-  entry: [
-    'webpack/hot/dev-server',
-    'webpack-dev-server/client?http://0.0.0.0:8080',
-    path.join(__dirname, 'src/index.js')
-  ],
+  entry: './src/index.js',
 
   output: {
-    path: path.join(__dirname, 'dist'),
+    path: PATHS.dist,
+    publicPath: PATHS.assets,
     filename: 'bundle.js'
   },
+
+  devServer: {
+    contentBase: PATHS.base,
+    historyApiFallback: true,
+    hot: true,
+    inline: true,
+    progress: true,
+    // stats: 'errors-only',
+    host: '0.0.0.0',
+    port: 5001
+  },
+
+  devtool: 'eval-source-map',
 
   module: {
     preLoaders: [
       {
         test: /\.js$/,
         loader: 'eslint-loader',
-        exclude: [node_modules_dir]
+        exclude: [nodeModulesDir]
       }
     ],
-
     loaders: [
       {
         test: /\.js$/,
-        loader: 'babel',
-        include: path.join(__dirname, 'src'),
-        exclude: [node_modules_dir],
+        cacheDirectory: true,
+        loader: 'babel-loader',
+        exclude: [nodeModulesDir],
         query: {
           presets: ['es2015']
         }
       },
-      {
-        test: /\.css$/,
-        loader: "style-loader!css-loader"
-      },
+      { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loaders
+      { test: /\.css$/, loader: 'style-loader!css-loader' },
+      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
     ]
   },
-
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
@@ -54,6 +63,11 @@ module.exports = {
       }
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin()
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: JSON.stringify('production')
+      }
+    })
   ]
 };
