@@ -3,25 +3,23 @@ const path = require('path');
 const nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
 const PATHS = {
-  entry: path.join(__dirname, 'src'),
-  app: path.join(__dirname, 'app'),
-  dist: path.join(__dirname, 'dist'),
-  assets: path.join(__dirname, 'assets'),
-  base: path.join(__dirname)
+  entry: path.resolve(__dirname, 'src'),
+  app: path.resolve(__dirname, 'app'),
+  dist: path.resolve(__dirname, 'dist'),
+  assets: path.resolve(__dirname, 'assets'),
+  base: path.resolve(__dirname)
 };
 
-console.log('PATHS.entry ', PATHS.entry);
 module.exports = {
-  entry: './src/index.js',
+  entry: [PATHS.entry],
 
   output: {
     path: PATHS.dist,
-    publicPath: PATHS.assets,
     filename: 'bundle.js'
   },
 
   devServer: {
-    contentBase: PATHS.base,
+    // contentBase: PATHS.entry,
     historyApiFallback: true,
     hot: true,
     inline: true,
@@ -51,7 +49,6 @@ module.exports = {
           presets: ['es2015']
         }
       },
-      { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loaders
       { test: /\.css$/, loader: 'style-loader!css-loader' },
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
     ]
@@ -63,11 +60,6 @@ module.exports = {
       }
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify('production')
-      }
-    })
+    new webpack.optimize.OccurrenceOrderPlugin()
   ]
 };

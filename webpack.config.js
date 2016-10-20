@@ -1,23 +1,30 @@
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 const nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
 const PATHS = {
-  entry: path.join(__dirname, 'src'),
-  app: path.join(__dirname, 'app'),
-  dist: path.join(__dirname, 'dist'),
-  assets: path.join(__dirname, 'assets'),
-  base: path.join(__dirname)
+  entry: path.resolve(__dirname, 'src'),
+  app: path.resolve(__dirname, 'app'),
+  dist: path.resolve(__dirname, 'dist'),
+  assets: path.resolve(__dirname, 'assets'),
+  base: path.resolve(__dirname)
 };
 
-console.log('PATHS.entry ', PATHS.entry);
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    main: [
+      './src/index.js',
+      './assets/stylesheets/layout.css',
+      './assets/images/icon.png'
+    ]
+  },
 
   output: {
     path: PATHS.dist,
-    publicPath: PATHS.assets,
-    filename: 'bundle.js'
+    filename: './assets/javascripts/bundle-[hash].js'
   },
 
   module: {
@@ -38,11 +45,16 @@ module.exports = {
           presets: ['es2015']
         }
       },
-      { test: /\.less$/, loader: 'style-loader!css-loader!less-loader' }, // use ! to chain loaders
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-      // { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
-      { test: /\.(png|jpg)$/, loader: 'file-loader?name=./assets/images/img-[hash:6].[ext]' }
-    ]
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
+      { test: /\.(jpe?g|png|gif|svg)$/i, loader: 'file-loader?name=assets/images/[name].[ext]' }
+    ],
+    resolve: {
+      root: [PATHS.entry],
+      extensions: ['', '.js', '.jsx', '.css'],
+      modulesDirectories: [
+        'node_modules'
+      ]
+    }
   },
   plugins: [
     new webpack.optimize.UglifyJsPlugin({
@@ -55,6 +67,12 @@ module.exports = {
       'process.env': {
         NODE_ENV: JSON.stringify('production')
       }
+    }),
+    new ExtractTextPlugin('./assets/stylesheets/layout-[hash].css', {
+      allChunks: true
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.html'
     })
   ]
 };
