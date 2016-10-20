@@ -1,10 +1,10 @@
 # waglewagle
 An unnamed square
 
-Waglewagle is a complete anonymous chat.
-No one knows who came into the chat room.
-It's because they come incognito.
-Create a name for the first occurrence.
+Waglewagle is a complete anonymous chat.  
+No one knows who came into the chat room.  
+It's because they come incognito.  
+Create a name for the first occurrence.  
 The conversation will be held in the dialogue room, but the dialogue will be deleted if you leave the chat room.
 
 If you don't know what firebase is, visit it.[google.firebase](https://firebase.google.com/)
