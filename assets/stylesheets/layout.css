@@ -34,13 +34,37 @@ html, body {
 #root header .header span {
   display: inline-block;
   vertical-align: middle;
+  width: 50px;
 }
 
 #root header .header #join-counting {
-  position: absolute;
-  top: 2px;
-  left: 145px;
-  color: #795548;
+  position: relative;
+}
+
+#root header .header #join-counting.bounce {
+  transform: scale(1);
+  animation-name: bounce;
+  animation-duration: .3s;
+}
+
+#root header .header #join-counting[data-badge]:after{
+  content: none;
+  background: none;
+}
+
+#root header .header #join-counting[data-badge].exsist:after {
+   content: attr(data-badge);
+   position: absolute;
+   top: -17px;
+   right: 2px;
+   font-size: .7em;
+   background: #1b1d1c;
+   color: #f3c61e;
+   width: 18px;
+   height: 18px;
+   text-align: center;
+   line-height: 18px;
+   border-radius: 50%;
 }
 
 #root header .out span {

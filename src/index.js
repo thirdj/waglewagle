@@ -14,9 +14,14 @@ const ucolor = colors[getColor()];
 const uid = unnamed();
 
 // "value", "child_added", "child_removed", "child_changed", or "child_moved".
-dbRef.child('wagle/users').on('child_removed', snap => {
-  const snapVal = snap.val();
-  console.log('users child_removed snap  ', snapVal);
+dbRef.child('wagle/users').on('child_removed', () => {
+  // const snapVal = snap.val();
+  const $joinCounting = $('#join-counting');
+  $joinCounting.addClass('bounce');
+  setTimeout(() => {
+    $joinCounting.removeClass('bounce');
+  }, 500);
+  // console.log('users child_removed snap  ', snapVal);
 });
 
 // connected user count
@@ -24,8 +29,15 @@ dbRef.child('wagle/users').on('value', (snap) => {
   // const posts = snap.val();
   // const keys = Object.keys(posts);
   const count = snap.numChildren();
+  const $joinCounting = $('#join-counting');
 
-  $('#join-counting').text((count > 1) ? count : '');
+  if (count) {
+    $joinCounting.attr('data-badge', count);
+    $joinCounting.addClass('exsist').addClass('bounce');
+    setTimeout(() => {
+      $joinCounting.removeClass('bounce');
+    }, 500);
+  }
 });
 
 dbRef.child('wagle/users').on('child_added', snap => {
