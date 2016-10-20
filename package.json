@@ -10,7 +10,7 @@
     "start": "NODE_ENV=development ./node_modules/.bin/webpack-dev-server --config ./webpack.dev.config.js",
     "start1": "NODE_ENV=development ./node_modules/.bin/webpack-dev-server --config ./webpack.dev.config.js --host=0.0.0.0 --hot --inline --progress --history-api-fallback"
   },
-  "author": "thirdj <thirdj@gmail.com> (http://thirdj.github.io)",
+  "author": "thirdj <thirdjj@gmail.com> (http://thirdj.github.io)",
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.16.0",

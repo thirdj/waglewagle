@@ -82,8 +82,6 @@ html, body {
 #root main #messages .logs {
   display: table;
   transform: scale(1);
-  /*animation-name: highlight;
-  animation-duration: .3s;*/
   animation-name: fadeIn;
   animation-duration: .3s;
 }
@@ -93,7 +91,6 @@ html, body {
 }
 
 #root main #messages .user {
-  __color: #00bfff;
   font-weight: bold;
   padding: 0 5px;
 }
