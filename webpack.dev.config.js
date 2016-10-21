@@ -1,5 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
 const nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
 const PATHS = {
@@ -29,7 +32,7 @@ module.exports = {
     port: 5001
   },
 
-  devtool: 'eval-source-map',
+  devtool: '#eval-source-map',
 
   module: {
     preLoaders: [
@@ -49,17 +52,26 @@ module.exports = {
           presets: ['es2015']
         }
       },
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
+      // { test: /\.css$/, loader: 'style-loader!css-loader' },
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
       { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
     ]
   },
   plugins: [
+    new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false
       }
     }),
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.optimize.OccurrenceOrderPlugin()
+    new ExtractTextPlugin('./assets/stylesheets/layout-[hash].css', {
+      allChunks: true
+    }),
+    new HtmlWebpackPlugin({
+      template: './index.tpl.html',
+      inject: 'body',
+      filename: 'index.html'
+    })
   ]
 };

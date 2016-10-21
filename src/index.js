@@ -12,11 +12,13 @@ const newMsgKey = dbRef.child('wagle/messages').push().key;
 const creation = moment().format('YYYY-MM-DD HH:mm:ss');
 const ucolor = colors[getColor()];
 const uid = unnamed();
+let connectUserCount;
 
 // "value", "child_added", "child_removed", "child_changed", or "child_moved".
 dbRef.child('wagle/users').on('child_removed', () => {
   // const snapVal = snap.val();
   const $joinCounting = $('#join-counting');
+
   $joinCounting.addClass('bounce');
   setTimeout(() => {
     $joinCounting.removeClass('bounce');
@@ -31,13 +33,14 @@ dbRef.child('wagle/users').on('value', (snap) => {
   const count = snap.numChildren();
   const $joinCounting = $('#join-counting');
 
-  if (count) {
+  if (connectUserCount !== count) {
     $joinCounting.attr('data-badge', count);
     $joinCounting.addClass('exsist').addClass('bounce');
     setTimeout(() => {
       $joinCounting.removeClass('bounce');
     }, 500);
   }
+  connectUserCount = count;
 });
 
 dbRef.child('wagle/users').on('child_added', snap => {
