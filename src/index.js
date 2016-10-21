@@ -63,30 +63,31 @@ dbRef.child('wagle/messages').on('child_changed', snap => {
 
 
 $(() => {
-  const wagleInputMessage = $('#wagle-input');
+  const $wagleInputMessage = $('#wagle-input');
+  const $wagleForm = $('#wagle-form');
 
   joinRoom();
 
-  wagleInputMessage.val('').focus();
+  $wagleInputMessage.val('').focus();
 
   $('main, footer').on('click', () => {
-    wagleInputMessage.focus();
+    $wagleInputMessage.focus();
   });
 
-  $('#wagle-form').on('submit', e => {
+  $wagleForm.on('submit', e => {
     e.preventDefault();
     e.stopPropagation();
 
     const times = getCurrentTime();
 
-    if ($.trim(wagleInputMessage.val()) === '') {
-      wagleInputMessage.val('').focus();
+    if ($.trim($wagleInputMessage.val()) === '') {
+      $wagleInputMessage.val('').focus();
       return false;
     }
 
-    writeNewMessage(wagleInputMessage.val(), times.unix);
+    writeNewMessage($wagleInputMessage.val(), times.unix);
 
-    wagleInputMessage.val('').focus();
+    $wagleInputMessage.val('').focus();
   });
 
   $(window).on('unload', () => {
@@ -152,15 +153,6 @@ function writeNewMessage(msg, timestamp, uuid) {
 
   return database.ref().update(updates);
 }
-
-function createGuid() {
-  function p8(s) {
-    const p = (`${Math.random().toString(16)}000000000`).substr(2, 8);
-    return s ? `-${p.substr(0, 4)}-${p.substr(4, 4)}` : p;
-  }
-  return p8() + p8(true) + p8(true) + p8();
-}
-console.log('🐶 createGuid ', createGuid());
 
 function unnamed() {
   return Math.random().toString(36).slice(2, 10);
