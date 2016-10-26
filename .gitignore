@@ -3,3 +3,4 @@ node_modules/**
 build/**
 assets/javascripts/firebase.config.js
 dist/**
+npm-*.log

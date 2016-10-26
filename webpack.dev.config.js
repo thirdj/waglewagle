@@ -14,7 +14,11 @@ const PATHS = {
 };
 
 module.exports = {
-  entry: [PATHS.entry],
+  entry: [
+    'webpack-dev-server/client?http://localhost:5001',
+    'webpack/hot/only-dev-server',
+    PATHS.entry
+  ],
 
   output: {
     path: PATHS.dist,
@@ -22,7 +26,7 @@ module.exports = {
   },
 
   devServer: {
-    // contentBase: PATHS.entry,
+    contentBase: PATHS.base,
     historyApiFallback: true,
     hot: true,
     inline: true,
@@ -46,7 +50,7 @@ module.exports = {
       {
         test: /\.js$/,
         cacheDirectory: true,
-        loader: 'babel-loader',
+        loader: ['babel-loader'],
         exclude: [nodeModulesDir],
         query: {
           presets: ['es2015']

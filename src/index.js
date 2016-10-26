@@ -5,31 +5,29 @@ import { database } from '../assets/javascripts/firebaseInit';
 import colors from '../assets/javascripts/helpers/colors';
 
 const dbRef = database.ref();
+const dbRefUsers = dbRef.child('wagle/users');
+const dbRefMessages = dbRef.child('wagle/messages');
 
 // Get a key for a new Post.
-const newMsgKey = dbRef.child('wagle/messages').push().key;
+const newMsgKey = dbRefMessages.push().key;
 
 const creation = moment().format('YYYY-MM-DD HH:mm:ss');
-const ucolor = colors[getColor()];
+const ucolor = colors[getRandomColor()];
 const uid = unnamed();
+
 let connectUserCount;
 
-// "value", "child_added", "child_removed", "child_changed", or "child_moved".
-dbRef.child('wagle/users').on('child_removed', () => {
-  // const snapVal = snap.val();
+
+dbRefUsers.on('child_removed', () => {
   const $joinCounting = $('#join-counting');
 
   $joinCounting.addClass('bounce');
   setTimeout(() => {
     $joinCounting.removeClass('bounce');
   }, 500);
-  // console.log('users child_removed snap  ', snapVal);
 });
 
-// connected user count
-dbRef.child('wagle/users').on('value', (snap) => {
-  // const posts = snap.val();
-  // const keys = Object.keys(posts);
+dbRefUsers.on('value', (snap) => {
   const count = snap.numChildren();
   const $joinCounting = $('#join-counting');
 
@@ -43,8 +41,7 @@ dbRef.child('wagle/users').on('value', (snap) => {
   connectUserCount = count;
 });
 
-dbRef.child('wagle/users').on('child_added', snap => {
-  // console.info('wagle/users  child_added');
+dbRefUsers.on('child_added', snap => {
   const snapData = snap.val();
   let data = {};
 
@@ -54,8 +51,7 @@ dbRef.child('wagle/users').on('child_added', snap => {
   appendMsgTemplate(data);
 });
 
-dbRef.child('wagle/messages').on('child_changed', snap => {
-  // console.info('wagle/messages  child_changed');
+dbRefMessages.on('child_changed', snap => {
   const snapData = snap.val();
   let data = {};
   for (const key in snapData) {
@@ -88,14 +84,14 @@ $(() => {
       return false;
     }
 
-    writeNewMessage($wagleInputMessage.val(), times.unix);
+    writeNewMessage($wagleInputMessage.val(), times.unix, uid);
 
     $wagleInputMessage.val('').focus();
   });
 
   $(window).on('unload', () => {
-    dbRef.child('wagle/users').child(uid).remove();
-    dbRef.child('wagle/messages').child(newMsgKey).remove();
+    dbRefUsers.child(uid).remove();
+    dbRefMessages.child(newMsgKey).remove();
   });
 });
 
@@ -104,23 +100,19 @@ $(() => {
  * functions
  *
  */
-function getColor() {
-  return Math.floor(Math.random() * colors.length);
-}
-
 function joinRoom() {
-  const msg = '입장 했습니다.';
+  const msg = '입장 했습니다...';
   const msgData = { uid, msg, creation, ucolor };
+  const times = getCurrentTime();
   const updates = {};
 
   updates[`/wagle/users/${uid}/${newMsgKey}`] = msgData;
-  updates[`/wagle/messages/${newMsgKey}/${getCurrentTime().unix}`] = msgData;
+  updates[`/wagle/messages/${newMsgKey}/${times.unix}`] = msgData;
 
   return database.ref().update(updates);
 }
 
 function setAppendMsgData(data, key) {
-  // console.log('setAppendMsgData', data, key);
   return {
     uid: data[key].uid,
     msg: data[key].msg,
@@ -130,10 +122,11 @@ function setAppendMsgData(data, key) {
 }
 
 function appendMsgTemplate(data) {
-  // console.log('appendMsgTemplate ', data);
   if (Object.keys(data).length && data.constructor === Object) {
     const time = moment().format('HH:mm');
-    $('#messages').append(
+    const $messages = $('#messages');
+
+    $messages.append(
       `
         <div class="logs">
           <span class="time">${time}</span>
@@ -142,12 +135,11 @@ function appendMsgTemplate(data) {
         </div>
       `
     );
-    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+    $messages.scrollTop($('#messages')[0].scrollHeight);
   }
 }
 
 function writeNewMessage(msg, timestamp, uuid) {
-  // console.info('start [writeNewMessage]');
   const msgData = { uid, msg, creation, ucolor };
   const updates = {};
 
@@ -157,14 +149,17 @@ function writeNewMessage(msg, timestamp, uuid) {
   return database.ref().update(updates);
 }
 
+function getRandomColor() {
+  return Math.floor(Math.random() * colors.length);
+}
+
 function unnamed() {
   return Math.random().toString(36).slice(2, 10);
 }
 
 function getCurrentTime() {
-  const times = {
+  return {
     unix: moment().unix(),
     creation: moment().format('YYYY-MM-DD HH:mm:ss')
   };
-  return times;
 }
