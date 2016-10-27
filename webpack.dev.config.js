@@ -31,7 +31,6 @@ module.exports = {
     hot: true,
     inline: true,
     progress: true,
-    // stats: 'errors-only',
     host: '0.0.0.0',
     port: 5001
   },
@@ -58,15 +57,21 @@ module.exports = {
       },
       // { test: /\.css$/, loader: 'style-loader!css-loader' },
       { test: /\.css$/, loader: ExtractTextPlugin.extract('style-loader', 'css-loader') },
-      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' } // inline base64 URLs for <=8k images, direct URLs for the rest
+      // inline base64 URLs for <=8k images, direct URLs for the rest
+      { test: /\.(png|jpg)$/, loader: 'url-loader?limit=8192' }
     ]
+  },
+  resolve: {
+    root: path.resolve(__dirname),
+    extensions: ['', '.js', '.jsx', '.css']
   },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false
-      }
+      },
+      sourceMap: false
     }),
     new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin('./assets/stylesheets/layout-[hash].css', {

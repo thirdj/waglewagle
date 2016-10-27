@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import moment from 'moment';
 
-import { database } from '../assets/javascripts/firebaseInit';
+import database from '../assets/javascripts/firebaseInit';
 import colors from '../assets/javascripts/helpers/colors';
 
 const dbRef = database.ref();
@@ -16,7 +16,6 @@ const ucolor = colors[getRandomColor()];
 const uid = unnamed();
 
 let connectUserCount;
-
 
 dbRefUsers.on('child_removed', () => {
   const $joinCounting = $('#join-counting');
