@@ -4,6 +4,7 @@ An unnamed square
 Waglewagle is a complete anonymous chat.  
 No one knows who came into the chat room.  
 It's because they come incognito.  
+
 Create a name for the first occurrence.  
 The conversation will be held in the dialogue room, but the dialogue will be deleted if you leave the chat room.
 
@@ -22,6 +23,11 @@ npm start
 ### Documentation
 
 [firebase](https://firebase.google.com/docs/), [webpack](https://webpack.github.io/)
+
+### TODO
+- [ ] support Mobile
+- [ ] Notification
+- [ ] User join message
 
 ### License
 
